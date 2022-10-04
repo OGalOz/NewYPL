@@ -2,9 +2,8 @@
 
 
 ## Overview
-The code in this repository can be used to match barcodes and inserts
-to their location within a genome. It was designed specifically to compliment
-a process which generates an expression library.
+The code in this repository is used to map barcodes to insert sequences and then
+to their genomic location. It was designed to map barcoded expression libraries.
 
 ## Dependencies
 This program runs on Linux using python3 and uses three programs within it: usearch, vsearch, and minimap2.
@@ -17,12 +16,12 @@ minimap2: https://github.com/lh3/minimap2
 
 
 ## Input Files:
-#### Reads FASTQ:
-This is the FASTQ file you received from PacBio
-#### Genome FNA
-This is the file containing the entire genome sequence
-#### Genome GFF
-This file contains the genes within the genome - note that contig
+#### Reads FASTQ
+This is the FASTQ file containing long read amplicons
+#### Genome assembly FNA
+This is the file containing the reference genome sequence
+#### Genome assembly GFF
+This file contains the annotations of the reference assembly - note that contig
 names should correspond between this and the genome fna file. 
 Example:
 ```
@@ -33,7 +32,8 @@ NZ_JH724188.1	RefSeq	gene	207	698	.	-	.	ID=gene-HMPREF1079_RS21295;Name=HMPREF10
 .
 ```
 #### Oligos FASTA
-This file contains the 4 oligos (pre barcode, post barcode, pre insert, post insert).
+This file contains the 4 oligos flanking barcode and insert fragment regions
+(5' of barcode, 3' of barcode, 5' of insert, 3' of insert).
 Could look like this:
 ```
 >5insert
@@ -50,27 +50,27 @@ There is one central config file, a JSON file that should be modelled after quik
 and another configurating JSON file (Default Config) which can be left unmodified, but can have its values changed if
 there is a need for new file names. It's up to you to name your config files, but you
 must point the central config file to the auxiliary JSON file within the key "default_cfg_path".
-Details described below
+Details described below.
 
 
 ## Central Config Description
-The central configuration file has many keys and details that aren't obvious.
-The following is a description for how to enter each key (TD?)
+The central configuration file contains many keys and details.
+The following is a description for how to enter each key:
 ```
-    "lib_names": e.g. ["BC1127", "BC1130"], a list of strings, each being a library name
+    "lib_names": e.g. ["Btheta", "Buniformis"], a list of strings, each being a library name
     "lib_genome_dir": e.g. "$HOME/data/ref_genomes"; a string with a path to a directory containing
     the files listed in the keys "lib_genome_filenames" and "lib_genome_gffs".
-    "lib_genome_filenames": e.g. ["BC1127.fasta", "BC1130.fasta"]; a list of strings representing
+    "lib_genome_filenames": e.g. ["Btheta.fasta", "Buniformis.fasta"]; a list of strings representing
     genome fna files within the directory from the key "lib_genome_dir", and the order must be corresponding
     to the lib names within the key "lib_names"
 
-    "lib_genome_gffs": e.g. ["BC1127.gff", "BC1130.gff"]; a list of strings representing
+    "lib_genome_gffs": e.g. ["Btheta.gff", "Buniformis.gff"]; a list of strings representing
     genome gff files within the directory from the key "lib_genome_dir", and the order must be corresponding
     to the lib names within the key "lib_names". (GFF files are a table with genes and locations)
 
     "minimap2_exec_path": e.g. "$HOME/bin/minimap2-2.24_x64-linux/minimap2"; path to minimap 2 executable file.
     "vsearch_exec_path": e.g. "$HOME/.conda/envs/main_env/bin/vsearch"; path to vsearch executable file.
-    "metagenome_bool": e.g. false, A bool describing whether this is a metagenome or not.
+    "metagenome_bool": e.g. false, A bool describing whether this is a metagenomic library or not.
 
     "minimap_qual_min": e.g. 60; an int representing minimum allowed minimap quality
     "default_cfg_path":  e.g. "$HOME/tests/json/default_cfg.json"; path to default config file (explained below)
@@ -139,7 +139,7 @@ This file us usually run with the following arguments:
 python3 src/run_steps.py central_config.json input_dir output_dir {start_point}
 ```
 Where {start_point} is an integer between 1 and 6 - where 1 means start from the beginning,
-6 means run from the last step (Plot generation), and every number between starts at that point.
+6 means run from the last step (Plot and stats generation), and every number between starts at that point.
 The program normally runs from step 1 through step 6
 
 
@@ -184,7 +184,6 @@ The program normally runs from step 1 through step 6
 
     where inp_dir and op_dir are the same as before.
 
-
 Note: If running a second time, use the same directory as before
       as an input (From #1), but this time the directory should
       include a directory within it called "split_files", and that
@@ -209,13 +208,6 @@ Note: If running a second time, use the same directory as before
     the paths to the genome's GFF files, similar to above with the
     library being related to the library in the first array.
     Make sure all input files are readable.
-
-
-
-
-Other info:
-    The file nHits2Loc2Count in the BC_... directory contains important
-    info.
 
 
 
