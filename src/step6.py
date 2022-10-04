@@ -195,7 +195,8 @@ def get_frag_cov_per_window(
     for ctg in contigs:
         print("Binning contig ", ctg)
         contig_len = contig2len[ctg]
-        if contig_len == 10**6:
+
+        if contig_len == 10**6 or contig_len < 6*(10**4):
             continue
         nFullWindows = contig_len // window_size
         last_window = contig_len % window_size
