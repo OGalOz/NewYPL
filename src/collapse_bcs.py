@@ -547,9 +547,9 @@ def compute_best_mappings_by_split_range(
     if mapping_vals[0] / mapping_vals[1] >= cp["min_BC_support_ratio"]:
         for k in loc2num_d.keys():
             if loc2num_d[k] == mapping_vals[0]:
-                #                 count = loc2num_d[k]
-                #                 k = k + (count,)
                 good_locs_by_ratio.append(k)
+                break
+
         if len(good_locs_by_ratio) == 0:
             raise RuntimeError(
                 "Key for best location not found somehow at min_BC_support_ratio filter step?\n"

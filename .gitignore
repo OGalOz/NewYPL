@@ -2,6 +2,7 @@ src/baseline_f.py
 bash
 tests/sample_data
 tests/outputs
+util/g_script.sh
 sample_data
 tmp
 tmp*
