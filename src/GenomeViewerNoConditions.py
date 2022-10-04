@@ -5,29 +5,10 @@ import pandas as pd
 import sys
 import contig_collider
 
-# from typing import
-
-# TD: Make sure 'target' and 'contig' are the same in genes count and
-# BC_loc_df
-
-
 class GenomeViewerNoConditions:
     def __init__(
         self, genes_count_df_fp, BC_loc_df_fp, show_plot=False, pdf_op_dir=None
     ):
-        """
-        The display is called with (for example 'rcnA':
-            class.show_gene(name='rcnA')
-
-        Required:
-
-
-
-
-        """
-        # self.__gscore_dir = gscore_dir
-        # self.__barseq_layout_df = pd.read_csv(os.path.join(gscore_dir,'barseq_layout.tsv'), sep='\t')
-        # self.__fscore_base_df = pd.read_csv(os.path.join(gscore_dir,'fscore_base.tsv'), sep='\t')
 
         self.show_plot = show_plot
         self.pdf_op_dir = pdf_op_dir
@@ -42,16 +23,10 @@ class GenomeViewerNoConditions:
         self.split_by_contigs()
         self.check_input_tables()
 
-        #
         self.__window_size = 10**4
-        # self.__min_fscore = -5
-        # self.__max_fscore = 20
         self.__gene_y = 18
         self.__gene_x_offset = 200
 
-        # self.__itnum = None
-        # self.__fscores = None
-        # self.__gscores = None
         self.__cur_gene_index = 0
         self.__cur_contig = None
         self.__score_type = "score_cnnls"
@@ -61,8 +36,6 @@ class GenomeViewerNoConditions:
         self.__gene_color = "#000000"
         self.__gene_score_color = "#FF0000"
 
-        # def set_score_type(self, score_type):
-        #    self.__score_type = score_type
 
     def split_by_contigs(self) -> None:
         """
@@ -81,20 +54,6 @@ class GenomeViewerNoConditions:
         self.genes_count_df, self.BC_loc_df = gc_df, bc_df
         g_ctgs_new = sorted(self.genes_count_df["contig"].unique())
         bc_ctgs_new = sorted(self.BC_loc_df["contig"].unique())
-        """
-        g_ctgs: List[str] = sorted(list(self.genes_count_df["contig"].unique()))
-        bc_ctgs: List[str] = sorted(list(self.BC_loc_df["contig"].unique()))
-        g_ctgs_new, bc_ctgs_new = contig_collider.collider(g_ctgs, bc_ctgs, presorted=True)
-
-        print("Now renaming the contig values")
-        for i in range(len(g_ctgs_new)):
-            self.genes_count_df["contig"].replace(g_ctgs[i], g_ctgs_new[i], inplace=True)
-        for i in range(len(bc_ctgs_new)):
-            self.BC_loc_df["contig"].replace(bc_ctgs[i], bc_ctgs_new[i], inplace=True)
-
-        print(self.genes_count_df["contig"])
-        print(self.BC_loc_df["contig"])
-        """
 
         g_ctg_d: Dict[str, pd.DataFrame] = {}
         bc_ctg_d: Dict[str, pd.DataFrame] = {}
@@ -107,8 +66,6 @@ class GenomeViewerNoConditions:
 
         self.g_ctg_d = g_ctg_d
         self.bc_ctg_d = bc_ctg_d
-        # Find non overlapping contigs
-        print("Finished setting up contig dictionaries")
         return None
 
     def check_input_tables(self):
@@ -200,12 +157,6 @@ class GenomeViewerNoConditions:
                 f"No genes that match this description were found: {input_str}"
             )
 
-        print("found genes:")
-        # DataFrame
-        print(genes)
-        print(type(genes))
-        print("current index: ", self.__cur_gene_index)
-        print("current contig:", self.__cur_contig)
 
         return genes
 
@@ -309,8 +260,6 @@ class GenomeViewerNoConditions:
         self.show()
 
     def show(self):
-        # Set
-        # This is a Series (?)
         cur_gene: pd.Series = self.current_gene()
         print("current gene", cur_gene)
 
@@ -318,12 +267,10 @@ class GenomeViewerNoConditions:
 
         print("current contig", cur_contig)
 
-        # Set
         (window_from, window_to) = self.window()
 
         print("Current window:", (window_from, window_to))
 
-        # genes is a dataframe
         genes: pd.DataFrame = self.get_appropriate_genes(
             contig=cur_contig, pos_from=window_from, pos_to=window_to
         )
@@ -333,8 +280,6 @@ class GenomeViewerNoConditions:
         )
 
         fragments_df = fragments_df.reset_index()
-        print("fragments_df:")
-        print(fragments_df)
 
         fig = plt.figure(figsize=(15, 7))
         ax = fig.add_subplot(111)
@@ -416,35 +361,11 @@ class GenomeViewerNoConditions:
 def main():
     args = sys.argv
     gene_count_df_fp, BC_loc_df, pdf_op_dir = args[1:]
-    # dbv = GenomeViewerNoConditions('genes_count_df.tsv', BC_loc_df, pdf_op_dir=pdf_op_dir)
     dbv = GenomeViewerNoConditions(gene_count_df_fp, BC_loc_df, pdf_op_dir=pdf_op_dir)
-    # dbv.show_gene(locus_tag="HMPREF1079_RS10730")
-    # dbv.show_gene(locus_tag="HMPREF1077_RS06780")
     dbv.show_gene(locus_tag="HMPREF1079_RS05170")
 
     ## 1
     dbv.show_next_gene()
-    ## 2
-    # dbv.show_next_gene()
-    ## 3
-    # dbv.show_next_gene()
-    ## 4
-    # dbv.show_next_gene()
-    ## 5
-    # dbv.show_next_gene()
-    ## 6
-    # dbv.show_next_gene()
-    ## 7
-    # dbv.show_next_gene()
-    ## 8
-    # dbv.show_next_gene()
-    ## 9
-    # dbv.show_next_gene()
-    ## 10
-    # dbv.show_next_gene()
-    ## 11
-    # dbv.show_next_gene()
-    ## 12
 
 
 if __name__ == "__main__":

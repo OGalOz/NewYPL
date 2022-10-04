@@ -14,8 +14,6 @@ in:
 in:
 etc
 
-##YH: DESCRIPTION NEEDS UPDATING
-
 """
 
 import os
@@ -66,8 +64,6 @@ def get_bc_to_seqs_dict_from_file(inp_fp, print_iter=10**4):
         bc_line = ins_line
         line_num += 1
         bc_num += 1
-    #         if bc_num % print_iter == 0:
-    #             print(f"Reached barcode # {bc_num}")
 
     FH.close()
     return bc_to_ins_d

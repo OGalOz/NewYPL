@@ -119,25 +119,14 @@ def run_mid(cfg_fp, op_dir, step_num) -> str:
         lib_op_dir = os.path.join(op_dir, lib)
         try:
             if step_num <= 2:
-                #                 print("\nRunning step 2 for lib " + lib)
-                #                 print("time now: " + str(datetime.datetime.now()))
-                #                 logs_dir = os.path.join(op_dir, "Logs")
                 run_step_2_singlelib(lib_op_dir, lib, cfg_d, interactive=False)
             if step_num <= 3:
-                #                 print("\nRunning step 3 for lib " + lib)
-                #                 print("time now: " + str(datetime.datetime.now()))
                 run_step_3_singlelib(lib_op_dir, lib, cfg_d)
             if step_num <= 4:
-                #                 print("\nRunning step 4 for lib " + lib)
-                #                 print("time now: " + str(datetime.datetime.now()))
                 run_step_4_singlelib(lib_op_dir, lib, cfg_d)
             if step_num <= 5:
-                #                 print("\nRunning step 5 for lib " + lib)
-                #                 print("time now: " + str(datetime.datetime.now()))
                 run_step_5_singlelib(lib_op_dir, lib, cfg_d)
             if step_num <= 6:
-                #                 print("\nRunning step 6 for lib " + lib)
-                #                 print("time now: " + str(datetime.datetime.now()))
                 run_step_6_singlelib(lib_op_dir, lib, cfg_d)
         except Exception as inst:
             print("Failed to run for library " + lib)
@@ -172,8 +161,6 @@ def get_help_str():
 
 
 def main():
-    # print("Writing log to 'log_output.txt'")
-    # logging.basicConfig(level=logging.DEBUG, filename='log_output.txt')
     start_time_str: str = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     print(("*" * 10 + "\n") * 5 + f"NEW RUN {start_time_str}" + ("*" * 10 + "\n") * 5)
     args = sys.argv
@@ -208,12 +195,6 @@ def main():
         + ("*" * 10 + "\n") * 5
     )
 
-    """
-    if args[-1] != "ylsc1":
-        print("Incorrect Args:")
-        print(help_str)
-    """
-    # test()
     return None
 
 

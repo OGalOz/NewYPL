@@ -127,12 +127,6 @@ def DubSeq_import_gff(gff_path) -> pd.DataFrame:
 
     genes.sort(key=lambda x: x["pos_from"], reverse=False)
 
-    # check that genes are sorted by pos_from
-    #     for i in range(1, len(genes)):
-    #         if genes[i]['pos_from'] < genes[i-1]['pos_from']:
-    #             raise ValueError('Genes are not sorted by pos_from: problem index = %s; prev_pos_from = %s; next_pos_from = %s'
-    #                          % (i, genes[i-1]['pos_from'], genes[i]['pos_from']) )
-
     # additional columns
     genes_count = len(genes)
     bnumber2indeces = {}

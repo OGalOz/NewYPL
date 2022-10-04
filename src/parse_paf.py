@@ -126,7 +126,6 @@ def get_read_name_to_info_dict(paf_df: pd.DataFrame) -> Dict[str, List[T]]:
     info_dict: Dict[str, int] = {}
     cols = list(paf_df.columns)
     cols.remove("read_name")
-    #     print(cols)
     N = len(cols)
     M = paf_df.shape[0]
     L = 10**5
