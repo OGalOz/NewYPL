@@ -1,10 +1,10 @@
 {
-    "lib_names": ["BC1127"],
-    "lib_genome_dir": "/usr2/people/omreeg/All_Work/Projects/YolPipeL/sample_data/ref_genomes",
-    "lib_genome_filenames": ["Bvulgatus_ATCC8482.fasta"],
-    "lib_genome_gffs": ["GCA_020885855.1_ASM2088585v1_genomic.gff"],
-    "minimap2_exec_path": "/usr2/people/omreeg/bin/minimap2-2.24_x64-linux/minimap2",
-    "vsearch_exec_path": "/usr2/people/omreeg/.conda/envs/main_env/bin/vsearch",
+    "lib_names": ["X"],
+    "lib_genome_dir": "path/to/genome_files_dir",
+    "lib_genome_filenames": ["X.fasta"],
+    "lib_genome_gffs": ["X.gff"],
+    "minimap2_exec_path": "/path/to/minimap2-2.24_x64-linux/minimap2",
+    "vsearch_exec_path": "/path/to/vsearch",
     "metagenome_bool": false,
     "collapse_params": {
         "min_perc_cov": 0.9, 
@@ -13,7 +13,7 @@
         "max_frag_diff_to_len": 0.25
     },
     "primer_info": {
-        "oligo_db_fp": "/usr2/people/omreeg/All_Work/Projects/NewYolPipeL/tests/sample_data/oligos_blunt-end.fa",
+        "oligo_db_fp": "path/to/oligos_blunt-end.fa",
         "flanking_names": {
             "BC_flanking": {"5": "5bc", 
                             "3": "3bc"},
@@ -22,8 +22,8 @@
         }
     },
     "step_1": {
-        "files_pre_split": true,
-        "usearch_exec_path": "/usr2/people/omreeg/bin/usearch",
+        "files_pre_split": false,
+        "usearch_exec_path": "/path/to/usearch",
         "search_pcr2": {
             "fwd": "GTTCTTATCTTTGCAGTCTC",
             "rev": "GAGATTTACGCTTTGGTAAAAGTTGG",
@@ -45,6 +45,6 @@
         "max_expected_error": 10
     },
     "minimap_qual_min": 60,
-    "default_cfg_path":  "/usr2/people/omreeg/All_Work/Projects/YolPipeL/default_cfg.json"
+    "default_cfg_path":  "path/to/default_cfg.json"
 
 }
