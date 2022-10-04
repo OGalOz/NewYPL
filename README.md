@@ -3,7 +3,8 @@
 
 ## Overview
 The code in this repository is used to map barcodes to insert sequences and then
-to their genomic location. It was designed to map barcoded expression libraries.
+to their genomic location (if a reference assembly is provided). 
+It was designed to map barcoded expression libraries.
 
 ## Dependencies
 This program runs on Linux using python3 and uses three programs within it: usearch, vsearch, and minimap2.
