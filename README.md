@@ -1,4 +1,4 @@
-# YolandasPipeline
+# Bacterial Overexpression Barcoded Shotgun Expression Library Sequencing (BOBa-Seq)
 
 
 ## Overview
