@@ -1,4 +1,4 @@
-# Bacterial Overexpression Barcoded Shotgun Expression Library Sequencing (Boba-Seq)
+# Bacterial Overexpression Barcoded Shotgun Expression Library Sequencing (Boba-seq)
 
 
 ## Overview
