@@ -30,9 +30,10 @@ import shutil
 import logging
 import json
 from prepare_plots import create_plots_dir, create_read_to_ins_histogram
+from typing import List, Dict, Tuple, Union
 
 
-def run_step_3_singlelib(op_lib_dir, lib_name, cfg_d):
+def run_step_3_singlelib(op_lib_dir, lib_name, cfg_d) -> None:
     """
     Args:
         op_lib_dir: library output dir
@@ -82,8 +83,10 @@ def run_step_3_singlelib(op_lib_dir, lib_name, cfg_d):
 
     print("Finished step 3.")
 
+    return None
 
-def make_op_dir(op_lib_dir, lib_name, cfg_d):
+
+def make_op_dir(op_lib_dir, lib_name, cfg_d) -> str:
     vs_op_dir = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["3"])
     if os.path.exists(vs_op_dir):
         shutil.rmtree(vs_op_dir, ignore_errors=True)
@@ -92,7 +95,7 @@ def make_op_dir(op_lib_dir, lib_name, cfg_d):
     return vs_op_dir
 
 
-def get_inp_fp(op_lib_dir, lib_name, cfg_d):
+def get_inp_fp(op_lib_dir, lib_name, cfg_d) -> str:
     ext_dir = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["2"])
     expected_fp = os.path.join(ext_dir, lib_name + cfg_d["d"]["fns"]["2"]["ins_fq"])
     if not os.path.exists(expected_fp):
@@ -101,7 +104,7 @@ def get_inp_fp(op_lib_dir, lib_name, cfg_d):
         return expected_fp
 
 
-def run_vsearch_filter_command(vs_exc, inp_fp, op_fp, max_ee):
+def run_vsearch_filter_command(vs_exc, inp_fp, op_fp, max_ee) -> List[str]:
     """
     vsearch -fastq_filter $f\_ins.fq -fastq_qmin 0 -fastq_qmax 93 -fastq_maxee 10
         -fastaout $f\_insert.fasta
@@ -140,7 +143,7 @@ def run_vsearch_filter_command(vs_exc, inp_fp, op_fp, max_ee):
     return log_list
 
 
-def run_vsearch_dereplicate_command(vs_exc, inp_fp, op_fp):
+def run_vsearch_dereplicate_command(vs_exc, inp_fp, op_fp) -> List[str]:
     """
     vsearch --derep_fulllength inp_fp --output op_fp --sizeout
     """
@@ -161,6 +164,9 @@ def run_vsearch_dereplicate_command(vs_exc, inp_fp, op_fp):
     res_str = res.stderr.decode("utf-8")
     print(res_str)
     print("Finished running vsearch with the above results.")
+
+    # We store the number n_unique in case we want it in the future - 
+    # it isn't currently in use.
     n_unique = get_important_nums(res_str, "derep")
 
     log_list = ["stderr: " + res_str]
@@ -168,7 +174,7 @@ def run_vsearch_dereplicate_command(vs_exc, inp_fp, op_fp):
     return log_list
 
 
-def get_important_nums(inp: str, typ: str):
+def get_important_nums(inp: str, typ: str) -> Union[int, Tuple[int,int]]:
     # in this function we parse the standard error outputs of vsearch filter/derep
     # so typ is one of 'filter' or 'derep'
     # inp is standard error string
@@ -180,7 +186,7 @@ def get_important_nums(inp: str, typ: str):
     return res
 
 
-def get_imp2(inp: str, typ: str):
+def get_imp2(inp: str, typ: str) -> Union[int, Tuple[int,int]]:
     # in this function we parse the standard error outputs of vsearch filter/derep
     # so typ is one of 'filter' or 'derep'
     # inp is standard error string
@@ -209,7 +215,7 @@ def get_imp2(inp: str, typ: str):
         raise RuntimeError("Could not find line 'Sorting' in vsearch output.")
 
 
-def get_imp1(inp: str, typ: str):
+def get_imp1(inp: str, typ: str) -> Union[int, Tuple[int,int]]:
     # in this function we parse the standard error outputs of vsearch filter/derep
     # so typ is one of 'filter' or 'derep'
     # inp is standard error string
@@ -236,5 +242,5 @@ def get_imp1(inp: str, typ: str):
         )
 
 
-def get_log_dir(op_lib_dir):
+def get_log_dir(op_lib_dir) -> str:
     return os.path.join(os.path.dirname(op_lib_dir), "Logs")

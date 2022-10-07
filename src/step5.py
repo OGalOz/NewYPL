@@ -380,11 +380,6 @@ def gene_fragment_overlap(
         if g_ix == nGeneRows:
             print(f"Reached final gene at fi {fi}, breaking.")
             break
-    #         print(f"Finished computing {(i+1)*frac}/{nFragRows} rows")
-    #         new_time = datetime.datetime.now()
-    #         print("Estimated time remaining: ", (nLoops - i - 1) * (new_time - start_time))
-    #         print("Current time: ", new_time)
-    #         start_time = new_time
 
     # This part of the program is the remaining lines that are outside
     # of the loops that were used to measure the timing of the program
@@ -436,7 +431,7 @@ def mid_gene_fragment_overlap_count(
     genes,
     start_time,
     dbg=False,
-):
+) -> Tuple[int, bool]:
     """
     Args:
         fi : frag index (row number)
@@ -494,7 +489,7 @@ def update_gix(g_ix, genes_pos_from, f_start, N) -> int:
     return g_ix
 
 
-def get_gff_fp(cfg_d, lib_name):
+def get_gff_fp(cfg_d, lib_name) -> str:
     if "gff_fp" in cfg_d:
         return cfg_d["gff_fp"]
     else:
@@ -502,7 +497,7 @@ def get_gff_fp(cfg_d, lib_name):
         return os.path.join(cfg_d["lib_genome_dir"], cfg_d["lib_genome_gffs"][lib_ix])
 
 
-def filter_gff(gff_df):
+def filter_gff(gff_df) -> pd.DataFrame:
     # This only returns the rows that represent important genes (CDS)
     return gff_df[gff_df["type"] == "CDS"]
 

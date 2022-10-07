@@ -51,12 +51,8 @@ from util_mod import force_create_dir
 from typing import List, Set, Tuple, Dict
 from collections import Counter
 
-# import matplotlib
-# import glob
-# from itertools import chain
 
-
-def run_step_2_singlelib(op_lib_dir, lib_name, cfg_d, interactive=False):
+def run_step_2_singlelib(op_lib_dir: str, lib_name: str, cfg_d: Dict, interactive=False) -> None:
     """
     Args:
         cfg_d (d): is the entire config_dict
@@ -124,12 +120,12 @@ def run_step_2_singlelib(op_lib_dir, lib_name, cfg_d, interactive=False):
 
     print("Finished Step 2.")
 
-    return
+    return None
 
 
 def load_and_filter_tables_from_oligosearch(
     tables_dir, lib, oligo_names, cfg_d, id_cutoff=90.0
-):
+) -> Tuple[pd.DataFrame, Dict]:
     """
     Args:
         tables_dir (str): Path to directory with tables
@@ -300,7 +296,7 @@ def filter_single_lib(
     return lib_df, summary_d
 
 
-def extract_insert_BC_pos(data_filtered, lib, cfg_d, op_lib_dir):
+def extract_insert_BC_pos(data_filtered, lib, cfg_d, op_lib_dir) -> Tuple[str, int, Dict[int, int]]:
     """
     Args:
         cfg_d (dict): contains the following important info:
@@ -340,16 +336,17 @@ def extract_insert_BC_pos(data_filtered, lib, cfg_d, op_lib_dir):
     bbCtr: Dict[int, int] = res[3]
     bbL: List[Tuple[int, int]] = res[4]
 
-    pos_op_dir = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["2"])
+    pos_op_dir: str = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["2"])
     force_create_dir(pos_op_dir)
     writePosBCandPosInsertToFile(lib, pos_bc, pos_ins, pos_op_dir, cfg_d, bbL)
 
+    # in case these aren't deleted
     del pos_bc, pos_ins
 
     return pos_op_dir, nBadBarcode, bbCtr
 
 
-def fiveThreeRemoveAndMerge(lib, data_grouped, flank_d, pos_bc, pos_ins):
+def fiveThreeRemoveAndMerge(lib, data_grouped, flank_d, pos_bc, pos_ins) -> Tuple[pd.DataFrame, pd.DataFrame, int, Dict[int,int], List[Tuple[int, int]] ]:
     """
     Args:
         flank_d: Contains these keys:
@@ -363,7 +360,7 @@ def fiveThreeRemoveAndMerge(lib, data_grouped, flank_d, pos_bc, pos_ins):
         pos_ins: A merged dataframe on query to insert positions (1-based start)
         nBadBarcode: Barcodes that are not 20 nt long
         badBarcodeCounter: A dictionary of bad barcode length to occurrence
-        badBarcodeList: A reverse sorted list of tuples with (occurrence, bad barcide length), used for plotting
+        badBarcodeList: A reverse sorted list of tuples with (occurrence, bad barcode length), used for plotting
     """
     ## merge the two flanking positions of BC
     ## each table has: ["query", "target", "qlo", "qhi"], grouped on "target"
@@ -428,7 +425,7 @@ def fiveThreeRemoveAndMerge(lib, data_grouped, flank_d, pos_bc, pos_ins):
     return pos_bc, pos_ins, nBadBarcode, badBarcodeCounter, badBarcodeList
 
 
-def writePosBCandPosInsertToFile(lib, pos_bc, pos_ins, pos_op_dir, cfg_d, bbL):
+def writePosBCandPosInsertToFile(lib, pos_bc, pos_ins, pos_op_dir, cfg_d, bbL) -> None:
 
     bc_path = os.path.join(pos_op_dir, lib + cfg_d["d"]["fns"]["2"]["bcs_tab"])
     pos_bc.to_csv(bc_path, sep="\t", header=False, index=False)
@@ -451,7 +448,7 @@ def writePosBCandPosInsertToFile(lib, pos_bc, pos_ins, pos_op_dir, cfg_d, bbL):
     print("Wrote bad barcode lengths to " + lib + cfg_d["d"]["fns"]["2"]["bad_BC_lens"])
 
 
-def write_summary_to_log(logs_dir, summary_d, lib):
+def write_summary_to_log(logs_dir, summary_d, lib) -> None:
     fp = os.path.join(logs_dir, lib + "_step2_oligo_hits.json")
     with open(fp, "w") as g:
         g.write(json.dumps(summary_d, indent=2))
@@ -491,7 +488,7 @@ def import_id_to_extract(in_file, op_lib_dir=".") -> Dict[str, Tuple[int, int]]:
     return extract_d
 
 
-def extract_by_pos(lib, input_file, bc_extract_d, ins_extract_d, op_lib_dir, cfg_d):
+def extract_by_pos(lib, input_file, bc_extract_d, ins_extract_d, op_lib_dir, cfg_d) -> Tuple[List[str], List[str]]:
     """
     Args:
         input_file: fastq of trimmed reads at lib + cfg_d["d"]["fns"]["1"]["trimmed"]
@@ -572,10 +569,10 @@ def extract_by_pos(lib, input_file, bc_extract_d, ins_extract_d, op_lib_dir, cfg
             % (len(bc_extract_d) - bc_count, input_file)
         )
     # Write out list of discarded read IDs (first term where bc or ins were not extracted
-    bc_log_list = report_and_write_discarded(
+    bc_log_list: List[str] = report_and_write_discarded(
         lib, op_lib_dir, bc_reads_dict, bc_count, "bc", cfg_d
     )
-    ins_log_list = report_and_write_discarded(
+    ins_log_list: List[str] = report_and_write_discarded(
         lib, op_lib_dir, ins_reads_dict, ins_count, "ins", cfg_d
     )
 
@@ -590,8 +587,8 @@ def extract_bc_seq(
     seq,
     qual,
     bc_out_handle,
-    bc_kept_count,
-):
+    bc_kept_count: int,
+) -> int:
     """
     Extracts barcode sequences using positions and write to file.
     """
@@ -622,7 +619,7 @@ def extract_ins_seq(
     qual,
     ins_out_handle,
     ins_kept_count,
-):
+) -> int:
     """
     Extracts insert sequences using positions and write to file.
     """
@@ -647,7 +644,7 @@ def extract_ins_seq(
     return ins_kept_count
 
 
-def report_and_write_discarded(lib, op_lib_dir, reads_dict, count, seq_type, cfg_d):
+def report_and_write_discarded(lib, op_lib_dir, reads_dict, count, seq_type, cfg_d) -> List[str]:
     """
     Note seq_type (string) is one of  'ins' or 'bc'
     """

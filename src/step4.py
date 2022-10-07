@@ -28,12 +28,12 @@ import logging
 import json
 import pandas as pd
 from collections import Counter
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from get_bc_to_ins_file import get_read_to_seq_dict_from_fa
 from parse_paf import parse_paf_file
 
 
-def run_step_4_singlelib(op_lib_dir, lib_name, cfg_d):
+def run_step_4_singlelib(op_lib_dir, lib_name, cfg_d) -> None:
     """
     Args:
         op_lib_dir: Central library dir
@@ -57,20 +57,20 @@ def run_step_4_singlelib(op_lib_dir, lib_name, cfg_d):
     print("Finished step 4.")
 
 
-def run_minimap_executable(op_lib_dir, lib_name, cfg_d):
+def run_minimap_executable(op_lib_dir, lib_name, cfg_d) -> Tuple[Dict, str]:
     insert_fp = get_step3_output(op_lib_dir, lib_name, cfg_d)
     minimap_exec = cfg_d["minimap2_exec_path"]
     genome_fp = get_genome_fp(lib_name, cfg_d)
     # minimap_dir: op_lib_dir/minimap
-    minimap_dir = create_minimap_dir(op_lib_dir, cfg_d)
+    minimap_dir: str = create_minimap_dir(op_lib_dir, cfg_d)
     op_fp = os.path.join(minimap_dir, lib_name + cfg_d["d"]["fns"]["4"]["minimap_op"])
     # log_d: stderr, file length of .paf output, percent hit
-    log_d = run_minimap2(minimap_exec, genome_fp, insert_fp, op_fp)
+    log_d: Dict = run_minimap2(minimap_exec, genome_fp, insert_fp, op_fp)
 
     return log_d, minimap_dir
 
 
-def run_minimap2(minimap_exec, inp_gnm, insert_fp, op_fp):
+def run_minimap2(minimap_exec, inp_gnm, insert_fp, op_fp) -> Dict:
     """
     minimap2 -x map-hifi {inp_gnm} {insert_fp} --paf-no-hit > {op_fp} &
     """
@@ -145,7 +145,7 @@ def get_step3_output(op_lib_dir, lib_name, cfg_d) -> str:
     return insert_fp
 
 
-def create_minimap_dir(op_lib_dir, cfg_d, force_create=True):
+def create_minimap_dir(op_lib_dir, cfg_d, force_create=True) -> str:
     minimap_dir = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["4"])
     if os.path.exists(minimap_dir):
         if force_create:
@@ -162,7 +162,7 @@ def create_minimap_dir(op_lib_dir, cfg_d, force_create=True):
     return minimap_dir
 
 
-def get_genome_fp(lib_name, cfg_d):
+def get_genome_fp(lib_name, cfg_d) -> str:
     """
     Description:
         Get path to genome fp using config dict

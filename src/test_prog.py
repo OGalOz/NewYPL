@@ -1,10 +1,7 @@
 """
 Basic testing file 
 
-Functions to test:
-    step5.gene_fragment_overlap
-    step5.combine_barcodes_with_other_data
-    step5.create_read_to_barcode_dict    
+Write tests for all imported functions from stepX files.
 
 """
 
@@ -16,6 +13,13 @@ import random
 import string
 from typing import List, Dict, Tuple, Any, Union, Optional
 import unittest
+
+from step1 import (
+    run_usearch_search_pcr2_command,
+    run_usearch_search_oligodb_command,
+    concat_files_to_output,
+    extract_file_name,
+        )
 
 from step5 import (
     gene_fragment_overlap,

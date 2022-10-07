@@ -27,7 +27,7 @@ from contig_collider import special_match_contig_names
 
 def run_step_6_singlelib(
     op_lib_dir, lib_name, cfg_d, plots_dirname="Plots", step_num=6
-):
+) -> None:
     """
     Within Step 6, we primarily create plots.
 
@@ -84,9 +84,9 @@ def run_step_6_singlelib(
     cumulative_gene_coverage_plot(genes_df, plots_dir, cfg_d, lib_name)
 
     # These contigs come from genome.fna file
-    genome_contig2len = get_contig_to_len(cfg_d, lib_name)
+    genome_contig2len: Dict[str,int] = get_contig_to_len(cfg_d, lib_name)
     # These contigs come from 'gff'
-    contigs = list(bc_mapped_noMulti_df["contig"].unique())
+    contigs: List[str] = list(bc_mapped_noMulti_df["contig"].unique())
     contig2len = reconcile_contig2len(genome_contig2len, contigs)
     create_all_contigs_fragment_maps(
         bc_mapped_noMulti_df, plots_dir, cfg_d, lib_name, contigs, contig2len
@@ -179,7 +179,7 @@ def run_step_6_singlelib(
 
 def get_frag_cov_per_window(
     bc_map_df, plots_dir, cfg_d, lib_name, contigs, contig2len, window_size=20000
-):
+) -> None:
     """
     Desc:
         Within this function, we create windows of 20KB with the median fragment coverage
@@ -528,7 +528,7 @@ def create_limited_contig_fragment_plot(
     plt.clf()
 
 
-def reconcile_contig2len(contig2len, contigs):
+def reconcile_contig2len(contig2len: Dict[str, int], contigs: List[str]) -> Dict[str, int]:
     # This function exists because there may be separate contig names
     # like X.1 vs X
     origs = sorted(list(contig2len.keys()))
@@ -540,7 +540,7 @@ def reconcile_contig2len(contig2len, contigs):
         )
 
     # This dict matches original contig name to possible new contig name with suffix
-    match_d = special_match_contig_names(origs, contigs)
+    match_d: Dict[str,str] = special_match_contig_names(origs, contigs)
 
     new_ctg2_orig = {}
     for i in range(len(origs)):

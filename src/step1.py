@@ -36,9 +36,9 @@ import subprocess
 import shutil
 import time
 from validate import verify_cfg_d
+from typing import List, Dict, Tuple
 
-
-def run_step_1_singlelib(op_lib_dir, lib_name, cfg_d, fq_fps):
+def run_step_1_singlelib(op_lib_dir: str, lib_name: str, cfg_d: Dict, fq_fps: List[str]) -> None:
     """
     Args:
         op_lib_dir is a directory main_output/lib_name
@@ -66,14 +66,14 @@ def run_step_1_singlelib(op_lib_dir, lib_name, cfg_d, fq_fps):
         print(f"Made Logs directory at {logs_dir}")
 
     # write output dir for step 1
-    usearch_op_dir = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["1"])
+    usearch_op_dir: str = os.path.join(op_lib_dir, cfg_d["d"]["steps2dirs"]["1"])
     if os.path.exists(usearch_op_dir):
         shutil.rmtree(usearch_op_dir, ignore_errors=True)
     os.mkdir(usearch_op_dir)
     print(f"Made output dir for step 1 at {usearch_op_dir}")
 
     # f_basenames is either lib or lib_X for files already split
-    f_basenames = [check_file_name(f) for f in fq_fps]
+    f_basenames = [extract_file_name(f) for f in fq_fps]
 
     usearch_pcr2_results, new_log = run_many_usearch_pcr2(
         fq_fps, f_basenames, cfg_d, usearch_op_dir
@@ -89,7 +89,7 @@ def run_step_1_singlelib(op_lib_dir, lib_name, cfg_d, fq_fps):
     log_list += log_oligodb
 
     ## Concatenate output files if there were multiple inputs
-    # skip this if there was a single input file <-> single output files
+    # skip this if there was a single input file <-> single output file
     if len(f_basenames) > 1:
         rmv_bool = cfg_d["step_1"]["remove_non_concatenated_oligo_ops"]
         concat_oligo_outputs(
@@ -118,13 +118,10 @@ def run_step_1_singlelib(op_lib_dir, lib_name, cfg_d, fq_fps):
 
     print("Finished step 1.")
 
-    return
+    return None
 
 
-#     return og_dir_path f_basenames ##YH: remove, not used in anything else?
-
-
-def run_many_usearch_pcr2(files_to_process, f_basenames, cfg_d, usearch_op_dir):
+def run_many_usearch_pcr2(files_to_process, f_basenames, cfg_d, usearch_op_dir) -> Tuple[Dict, List[str]]:
     """
     Args:
         files_to_process list(fp)
@@ -168,12 +165,12 @@ def run_many_usearch_pcr2(files_to_process, f_basenames, cfg_d, usearch_op_dir):
 
     print("Finished running usearch search_pcr2, now on to running usearch oligodb")
 
-    return usearch_pcr2_results, log_list
+    return (usearch_pcr2_results, log_list)
 
 
 def run_usearch_search_pcr2_command(
     fq_fp: str, f_basename: str, op_lib_dir: str, usearch_exec_path, arg_d, cfg_d
-):
+) -> Tuple[Dict, List[str]]:
     """
     Args:
         op_lib_dir (str): Path to directory to write
@@ -238,8 +235,9 @@ def run_usearch_search_pcr2_command(
     ]
     # The output from the file is stored in res.stdout
     res = subprocess.run(command_args, capture_output=True)
-    log_list = ["stdout: " + res.stdout.decode("utf-8")]
-    log_list += ["stderr: " + res.stderr.decode("utf-8")]
+    log_list: List[str] = ["stdout: " + res.stdout.decode("utf-8"),
+            "stderr: " + res.stderr.decode("utf-8")
+            ]
     ret_d = {"fq_out": fq_out}
     return ret_d, log_list
 
@@ -254,7 +252,7 @@ def get_file_length(fp: str) -> int:
 
 def run_many_usearch_search_oligodbs(
     usearch_pcr2_results, cfg_d, usearch_op_dir, oligo_db_fp
-):
+) -> List[str]:
     """
     Description:
         On every single file outputted from usearch search_pcr2 (which may be
@@ -273,13 +271,14 @@ def run_many_usearch_search_oligodbs(
         trim = cfg_d["d"]["fns"]["1"]["trimmed"].split(".")[
             0
         ]  # something like '_trimmed'
-        file_basename = check_file_name(v["fq_out"]).split(trim)[0]
+        file_basename = extract_file_name(v["fq_out"]).split(trim)[0]
         us_oligodb_basenames.append(file_basename)
 
+    log_list: List[str] = []
     for i in range(len(us_oligodb_f2p)):
         fq_fp = us_oligodb_f2p[i]
         f_basename = us_oligodb_basenames[i]
-        log_list = run_usearch_search_oligodb_command(
+        log_list += run_usearch_search_oligodb_command(
             fq_fp,
             oligo_db_fp,
             cfg_d["step_1"]["usearch_exec_path"],
@@ -301,7 +300,7 @@ def run_usearch_search_oligodb_command(
     usearch_op_dir,
     cfg_d,
     nThreads=None,
-):
+) -> List[str]:
     """
     Description: 
     Note that the input 'fq_fp' is the output of usearch -search_pcr2, and not the 
@@ -317,7 +316,7 @@ def run_usearch_search_oligodb_command(
         dictionary containing usearch results 
     """
 
-    command_args = [usearch_exec_path]
+    command_args: List[str] = [usearch_exec_path]
     if nThreads is not None:
         command_args += ["-threads", str(nThreads)]
     fp_out = os.path.join(usearch_op_dir, f_basename + cfg_d["d"]["fns"]["1"]["insbc"])
@@ -350,16 +349,17 @@ def run_usearch_search_oligodb_command(
     print(res)
     print("Finished running usearch with the above commands.")
 
-    log_list = ["stdout: " + res.stdout.decode("utf-8")]
-    log_list += ["stderr: " + res.stderr.decode("utf-8")]
+    tmp_log_list: List[str] = ["stdout: " + res.stdout.decode("utf-8"),
+                "stderr: " + res.stderr.decode("utf-8")
+            ]
 
-    return log_list
+    return tmp_log_list
 
 
-def concatenate_usearch_pcr2_results(usearch_op_dir, lib, cfg_d, remove_old=True):
+def concatenate_usearch_pcr2_results(usearch_op_dir: str, lib, cfg_d, remove_old=True) -> str:
     """
     Description:
-        We combine fastq files into a single fastq file
+        We combine multiple fastq files into a single fastq file
     Args:
         usearch_op_dir (str) : Path to directory with
                                outputs from usearch pcr2
@@ -369,9 +369,6 @@ def concatenate_usearch_pcr2_results(usearch_op_dir, lib, cfg_d, remove_old=True
 
     op_d: str = usearch_op_dir
     all_lib_fs = os.listdir(op_d)
-    #     dir_fs = os.listdir(op_d)
-    #     # Below should be no different than dir_fs in this case (?)
-    #     all_lib_fs = [x for x in dir_fs if x.startswith(lib)]
 
     print("Concatenating usearch pcr2 '.fq' files for library " + lib)
 
@@ -407,7 +404,7 @@ def concatenate_usearch_pcr2_results(usearch_op_dir, lib, cfg_d, remove_old=True
     return op_d
 
 
-def concat_oligo_outputs(op_dir, f_basenames, lib, cfg_d, remove_old=False):
+def concat_oligo_outputs(op_dir, f_basenames, lib, cfg_d, remove_old=False) -> None:
     """
     Args:
         op_dir: The directory in which the outputs of the usearch
@@ -453,10 +450,10 @@ def concat_oligo_outputs(op_dir, f_basenames, lib, cfg_d, remove_old=False):
 
     print("Wrote concatenated files to " + op_dir)
 
-    return
+    return None
 
 
-def concat_files_to_output(inp_fs, op_f):
+def concat_files_to_output(inp_fs: List[str], op_f: str) -> None:
     """
     Concatenates files into a single output
     inp_fs List[str]: input files to concatenate.
@@ -476,8 +473,10 @@ def concat_files_to_output(inp_fs, op_f):
                 with open(f, "rb") as fd:
                     shutil.copyfileobj(fd, wfd)
 
+    return None
 
-def check_file_name(full_path, already_split=False):
+
+def extract_file_name(full_path: str, already_split=False) -> str:
     """
     Extracts file name before extension .fq or .fastq,
     e.g. BC112.fq -> BC112
@@ -498,7 +497,7 @@ def check_file_name(full_path, already_split=False):
         raise Exception(
             "Each fastq file in the input directory should end "
             "with '.fq' or '.fastq'. Instead"
-            " file looks like: " + file_basename
+            " file named: " + file_basename
         )
 
     if split_file_name[0] == "Logs":
